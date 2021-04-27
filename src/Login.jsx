@@ -2,7 +2,6 @@ import axios from 'axios'
 import React, { memo } from 'react'
 import { Redirect } from 'react-router'
 import FormLogin from './FormLogin.jsx'
-import './Login.css'
 const Login = function Login(props){
     const {user,setUser,updateFriendList} = props;
     const onFinish = (values)=>{
