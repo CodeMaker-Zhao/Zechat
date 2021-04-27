@@ -1,0 +1,83 @@
+.submit{
+    font-family:"iconfont" !important;
+    font-size:35px;
+    display: block;
+    color: rgb(43, 81, 151);
+    font-style:normal;
+    margin-left: 30px;
+}
+.submit:hover{
+    cursor: pointer;
+}
+.item{
+    width: 30px;
+    height: 30px;
+    background-repeat: no-repeat;
+    background-size: 30px auto;
+    background-image: url('./baidu.png');
+}
+.emojiTab{
+    margin-right: 20px;
+}
+.emojiButton{
+    font-family: "iconfont"  !important;
+    font-size: 25px;
+    background-color: rgba(255, 255, 255,0);
+    border: 0px;
+}
+.emojiList{
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    top:-250px;
+    left:0px;
+    width: 410px;
+    padding: 0 5px;
+    padding-top: 8px;
+    background-color: rgb(255, 255, 255);
+    height: 250px;
+}
+.emojibar{
+    position: absolute;
+    height: 30px;
+    top:-280px;
+    left:0px;
+    width: 410px;
+    font-family: 'Times New Roman', Times, serif;
+    background-color: rgb(255,255,255);
+    padding:5px 10px;
+}
+.emojiItem{
+    width: 30px;
+    height: 30px;
+    background-repeat: no-repeat;
+    background-size: 30px auto;
+}
+.emojiBlock{
+    width: 40px;
+    height: 40px;
+    padding: 5px;
+}
+.emojiBlock:hover{
+    background-color: silver;
+}
+.inputContent{
+    width: 100%;
+    font-size: large;
+    position: relative;
+    border: 0px;
+    flex: 1 1 50px;
+    display: flex;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.5);
+    padding: 0px 20px;
+}
+.input{
+    width: 90%;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 5px;
+    display: block;
+    font-size: 15px;
+    padding: 4px;
+}

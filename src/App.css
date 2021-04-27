@@ -1,38 +1,15 @@
-.App {
-  text-align: center;
+.App{
+    height: 100%;
+    background-image: url(./bg.jpg);
+    background-size: cover;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+@font-face {
+    font-family: 'iconfont';  /* project id 2501253 */
+    src: url('//at.alicdn.com/t/font_2501253_8zkn1owmhyf.eot');
+    src: url('//at.alicdn.com/t/font_2501253_8zkn1owmhyf.eot?#iefix') format('embedded-opentype'),
+    url('//at.alicdn.com/t/font_2501253_8zkn1owmhyf.woff2') format('woff2'),
+    url('//at.alicdn.com/t/font_2501253_8zkn1owmhyf.woff') format('woff'),
+    url('//at.alicdn.com/t/font_2501253_8zkn1owmhyf.ttf') format('truetype'),
+    url('//at.alicdn.com/t/font_2501253_8zkn1owmhyf.svg#iconfont') format('svg');
 }

@@ -1,0 +1,39 @@
+.sideMenu{
+    flex: 1;
+    height: 100%;
+    flex-direction: column;
+    height: 100%;
+    border-bottom-left-radius: 10px;
+    background-color: rgba(255 ,255, 255,0.8);
+    overflow: auto;
+}
+.friend{
+    height: 50px;
+    display: flex;
+    flex-direction: row;
+    padding:0px 5px;
+}
+.groupIcon{
+    font-family: "iconfont"  !important;
+    font-size: 30px;
+    font-style: normal;
+    margin: 0 10px;
+}
+.friend h1{
+    font-size: 20px;
+    margin-bottom: 0px;
+    font-family: zillaslab,palatino,"Palatino Linotype",serif;
+}
+.friend p{
+    margin-bottom: 0px;
+    width:200px;/*要显示文字的宽度*/
+    text-overflow :ellipsis; /*让截断的文字显示为点点。还有一个值是clip意截断不显示点点*/
+    white-space :nowrap; /*让文字不换行*/
+    overflow : hidden; /*超出要隐藏*/
+}
+.friend:hover{
+    cursor: pointer;
+}
+.picked{
+    background-color: rgba(173, 184, 196, 0.8);
+}

@@ -1,0 +1,23 @@
+.wrapper{
+    width: 400px;
+    height: 300px;
+    padding:35px 50px 0px 50px;
+    position: absolute;
+    background-color: #fff;
+    left: 0;
+    right: 0;
+    top:0;
+    bottom: 0;
+    margin: auto;
+    border: silver 1px solid;
+    border-radius: 10px;
+}
+.wrapper h1{
+    font-family: zillaslab,palatino,"Palatino Linotype",serif;
+    text-align: center;
+    color: #1890ff;
+}
+.submit_row{
+    display: flex;
+    justify-content: space-around;
+}
