@@ -35,5 +35,5 @@ npm run start;//启动客户端
 3、在浏览器输入localhost:3000端口即可进入
 
 ## 效果图
-[](./screenshot.png)
-[](./screenshot2.png)
+<img src="screenshot.png" style="zoom:50%;" />
+<img src="screenshot2.png" style="zoom:50%;"/>
