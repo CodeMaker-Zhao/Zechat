@@ -11,7 +11,7 @@ import { Popover, Popconfirm, message as msa } from 'antd';
 const socket = io();
 
 export default function Chatroom(props) {
-    const { 
+    const {
         user,
         setUser,
         updateFriendList,
@@ -38,7 +38,7 @@ export default function Chatroom(props) {
                 msa.info('已发送请求');
             }
         },
-        [socket, user,friendList]
+        [user, friendList]
     )
     const inpRef = useRef(null);
     const mainRef = useRef(null);
@@ -54,13 +54,13 @@ export default function Chatroom(props) {
             }
             setOnlineList(olist);
         })
-    }, [user])
+    }, [user, setOnlineList])
     useEffect(() => {
         const text = document.getElementsByClassName('input')[0];
         const submit = document.getElementsByClassName('submit')[0];
         const cur = inpRef.current;
         const myFunction = function (e) {
-            if (e.keyCode === 13 && e.shiftKey != true && e.target.value != '') {
+            if (e.keyCode === 13 && e.shiftKey !== true && e.target.value !== '') {
                 socket.emit('chat', JSON.stringify({
                     msg: e.target.value,
                     from: user.username,
@@ -87,38 +87,38 @@ export default function Chatroom(props) {
         }
     }, [chatroom, user])
     useEffect(() => {
-        let myFunction = (e)=>{
+        let myFunction = (e) => {
             const el = e.target.closest('.emojiTab')
-            if(!el && emojiShow){
+            if (!el && emojiShow) {
                 toggleEmojiShow(false);
             }
         }
         const main = mainRef.current;
-        main.addEventListener('click',myFunction);
+        main.addEventListener('click', myFunction);
         return () => {
-            main.removeEventListener('click',myFunction);
+            main.removeEventListener('click', myFunction);
         }
-    }, [mainRef,emojiShow]) 
+    }, [mainRef, emojiShow, toggleEmojiShow])
     useEffect(() => {
         socket.on('chat', (msg) => {
             msg = JSON.parse(msg);
             if (Array.isArray(msg)) {
                 setMessageList(messageList => [...messageList, ...msg]);
-                msg.map(item=>{
+                msg.forEach(item => {
                     if (item.to === 'public') {
-                        updateLastMessageList('public',item);
-                    }else{
+                        updateLastMessageList('public', item);
+                    } else {
                         const toc = item.to === user.username ? item.from : item.to;
-                        updateLastMessageList(toc,item);
+                        updateLastMessageList(toc, item);
                     }
                 })
             } else {
                 setMessageList(messageList => [...messageList, msg]);
                 if (msg.to === 'public') {
-                    updateLastMessageList('public',msg);
-                }else{
+                    updateLastMessageList('public', msg);
+                } else {
                     const toc = msg.to === user.username ? msg.from : msg.to;
-                    updateLastMessageList(toc,msg);
+                    updateLastMessageList(toc, msg);
                 }
             }
         })
@@ -126,7 +126,7 @@ export default function Chatroom(props) {
             console.log(from);
             updateFriendList([from]);
         })
-    }, [])
+    }, [updateFriendList, updateLastMessageList, user.username])
     const addEmoji = useCallback(
         (e) => {
             const inp = inpRef.current;
@@ -134,29 +134,39 @@ export default function Chatroom(props) {
             inp.focus();
             toggleEmojiShow(false);
         },
-        []
+        [toggleEmojiShow]
     )
     const exit = useCallback(
-        ()=>{
+        () => {
             setUser(null);
             localStorage.removeItem('notificationToken');
             window.location = '/login'
-        },[]
+        }, [setUser]
     )
+
+    const sendExp = (msg)=>{
+        socket.emit('chat', JSON.stringify({
+            msg,
+            from: user.username,
+            to: chatroom,
+            id: user.id
+        }))
+    }
+
     const text = <span>在线列表</span>;
     const content = (
         <div>
 
-            {onlineList.map((item) => {
-                return item === user.username ? 
-                <p className="onlineMine" ket={item}>{item}</p> : 
-                <Popconfirm
-                    placement="bottom"
-                    icon={<FireFilled style={{ color: 'red' }} />}
-                    onConfirm={() => { add_concat(item) }}
-                    title='您要添加对方为好友嘛?'>
-                    <p className="onlineItem" key={item}>{item}</p>
-                </Popconfirm>
+            {onlineList.map((item,index) => {
+                return item === user.username ?
+                    <p className="onlineMine" key={index}>{item}</p> :
+                    <Popconfirm
+                        placement="bottom"
+                        icon={<FireFilled style={{ color: 'red' }} />}
+                        onConfirm={() => { add_concat(item) }}
+                        title='您要添加对方为好友嘛?'>
+                        <p className="onlineItem" key={index}>{item}</p>
+                    </Popconfirm>
             })}
         </div>
     );
@@ -167,7 +177,7 @@ export default function Chatroom(props) {
                 <Popconfirm
                     className="exit"
                     placement="bottomRight"
-                    onConfirm={()=>{exit()}}
+                    onConfirm={() => { exit() }}
                     title='您要确定退出嘛?'
                 >
                     <i className="popButton">&#xe72e;</i>
@@ -177,27 +187,29 @@ export default function Chatroom(props) {
                 </Popover>
             </div>
             <div className="content">
-                <FirendList 
-                friendList={friendList} 
-                chatroom={chatroom} 
-                setChatroom={setChatroom} 
-                lastMessageList={lastMessageList}
+                <FirendList
+                    friendList={friendList}
+                    chatroom={chatroom}
+                    setChatroom={setChatroom}
+                    lastMessageList={lastMessageList}
                 />
                 <div className="mainContent" ref={mainRef}>
-                    <ChatContent 
-                    socket={socket} 
-                    chatroom={chatroom} 
-                    messageList={messageList} 
-                    user={user}
-                    friendList={friendList}
-                    updateLastMessageList={updateLastMessageList}
-                    className="chatContent" />
+                    <ChatContent
+                        socket={socket}
+                        chatroom={chatroom}
+                        messageList={messageList}
+                        user={user}
+                        friendList={friendList}
+                        updateLastMessageList={updateLastMessageList}
+                        className="chatContent" />
 
-                    <InputContent 
-                    inpRef={inpRef} 
-                    addEmoji={addEmoji} 
-                    emojiShow={emojiShow} 
-                    toggleEmojiShow={toggleEmojiShow} />
+                    <InputContent
+                        inpRef={inpRef}
+                        socket={socket}
+                        sendExp={sendExp}
+                        addEmoji={addEmoji}
+                        emojiShow={emojiShow}
+                        toggleEmojiShow={toggleEmojiShow} />
                 </div>
             </div>
         </div>

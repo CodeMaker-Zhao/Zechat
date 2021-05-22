@@ -1,5 +1,5 @@
 import axios from 'axios'
-import React, { memo } from 'react'
+import React from 'react'
 import { Redirect } from 'react-router'
 import FormLogin from './FormLogin.jsx'
 const Login = function Login(props){

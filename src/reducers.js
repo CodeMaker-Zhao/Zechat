@@ -12,7 +12,7 @@ const reducers = {
         const {type,payload} = action;
         switch (type) {
             case ACTION_SET_USER:
-                return payload
+                return payload;
             default:
                 break;
         }

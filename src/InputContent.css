@@ -17,14 +17,18 @@
     background-image: url('./baidu.png');
 }
 .emojiTab{
-    margin-right: 20px;
+    margin-right: 5px;
+}
+.otherTab{
+    margin-right: 10px;
 }
 .emojiButton{
     font-family: "iconfont"  !important;
-    font-size: 25px;
+    font-size: 30px;
     background-color: rgba(255, 255, 255,0);
     border: 0px;
 }
+
 .emojiList{
     position: absolute;
     display: flex;
@@ -38,6 +42,35 @@
     background-color: rgb(255, 255, 255);
     height: 250px;
 }
+.expList{
+    display: flex;
+    flex-wrap: wrap;
+    overflow: auto;
+    height: 200px;
+}
+.searchBar{
+    height: 30px;
+    font-size: 15px;
+    width: 100%;
+}
+.searchBar input{
+    flex:1;
+    width: 80%;
+    border:1px solid rgb(217, 217, 217);
+    border-radius: 3px;
+}
+.searchBar button{
+    background-color: #1890ff;
+    color: aliceblue;
+    border: 0px;
+    margin-left: 1px;
+    border-radius: 3px;
+    height: 100%;
+}
+.exp{
+    max-width: 95px;
+    max-height: 95px;
+}
 .emojibar{
     position: absolute;
     height: 30px;
@@ -47,6 +80,8 @@
     font-family: 'Times New Roman', Times, serif;
     background-color: rgb(255,255,255);
     padding:5px 10px;
+    display: flex;
+    gap:10px;
 }
 .emojiItem{
     width: 30px;

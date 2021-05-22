@@ -53,7 +53,7 @@ function App(props) {
             }
         })
     }
-  }, [])
+  }, [dispatch])
   return (
     <div className="App">
       <Switch>

@@ -1,10 +1,10 @@
-import React,{useEffect} from 'react'
+import React from 'react'
 import './FormLogin.css'
 import { Form, Input, Button } from 'antd'
 import 'antd/dist/antd.css'
 
 export default function FormLogin(props) {
-    const {isLogin,onFinish,setUser} = props;
+    const {isLogin,onFinish} = props;
     const onFinishFailed = (errorInfo) => {
         console.log(errorInfo);
     }

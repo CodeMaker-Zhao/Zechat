@@ -13,22 +13,39 @@ const emoji = [
 ];
 
 function Message(props) {
-    const { user, message, showTime,add_concat } = props;
+    const { user, message, showTime, add_concat } = props;
     let [time] = useState(new Date(Number(message.date)).toLocaleTimeString());
     const msg = useMemo(() => {
-        let content = message.msg.replace(/#\((.+?)\)/g, (r, e) => {
-            const index = emoji.indexOf(e);
-            if (index !== -1) {
-                return `<div class="icon"  style="background-position: left ${-30
-                    * index}px;background-image: url(${BaiduImage})" alt="${r}"></div>`;
-            }
-            return r;
-        })
-        return (
-            <div className="msgicon" dangerouslySetInnerHTML={{ __html: content }}>
+        let content,type = 'string';
+        if(/#\((.+?)\)/.test(message.msg)){
+            content = message.msg.replace(/#\((.+?)\)/g, (r, e) => {
+                const index = emoji.indexOf(e);
+                if (index !== -1) {
+                    return `<div class="icon"  style="background-position: left ${-30
+                        * index}px;background-image: url(${BaiduImage})" alt="${r}"></div>`;
+                }
+                return r;
+            })
+        }else if(/\$\(img\)/.test(message.msg)){
+            type = 'img';
+            content = message.msg.replace(/\$\(img\)/,'')
+        }else{
+            content = message.msg;
+        }
+        if (type==='string') {
+            return (
+                <div className="msgicon" dangerouslySetInnerHTML={{ __html: content }}>
 
-            </div>
-        );
+                </div>
+            );
+        } else if (type==='img') {
+            return (
+                <div >
+                    <img className='exp' alt='消息图片' src={content}></img>
+                </div>
+            )
+        }
+
     }, [message])
     return (
         <Fragment>
@@ -37,11 +54,11 @@ function Message(props) {
             </div> : ''}
             <div className={classnames({ 'mine': user.id === message.id, 'others': user.id !== message.id })}>
                 {user.id === message.id ? '' : <div className='info'>
-                    <Popconfirm 
-                    placement="bottom" 
-                    icon={<FireFilled style={{ color: 'red' }} />} 
-                    onConfirm={()=>{add_concat(message.from)}} 
-                    title='您要添加对方为好友嘛?'>
+                    <Popconfirm
+                        placement="bottom"
+                        icon={<FireFilled style={{ color: 'red' }} />}
+                        onConfirm={() => { add_concat(message.from) }}
+                        title='您要添加对方为好友嘛?'>
                         <i className='iconfont'>
                             &#xe62d;</i>
                     </Popconfirm>
@@ -67,7 +84,7 @@ function Message(props) {
 }
 
 export default function ChatContent(props) {
-    const { messageList, user, socket, chatroom,friendList } = props;
+    const { messageList, user, socket, chatroom, friendList } = props;
     const msl = useRef(null);
     let lastTime;
     const add_concat = useCallback(
@@ -83,17 +100,17 @@ export default function ChatContent(props) {
                 msa.info('已发送请求');
             }
         },
-        [socket, user,friendList]
+        [socket, user, friendList]
     )
     useEffect(() => {
         msl.current.scrollTop = msl.current.scrollHeight - msl.current.clientHeight
-    },[messageList,msl,chatroom]);
+    }, [messageList, msl, chatroom]);
     return (
         <div ref={msl} className="messageList">
-            {messageList.map((item, index) => {
+            {messageList.map((item) => {
                 let showTime = false;
                 if (chatroom === 'public' && item.to === 'public') {
-                    if (lastTime == undefined) {
+                    if (lastTime === undefined) {
                         showTime = true;
                         lastTime = item.date;
                     } else if (item.date - lastTime > 1000 * 60) {
@@ -102,7 +119,7 @@ export default function ChatContent(props) {
                     }
                     return <Message add_concat={add_concat} socket={socket} user={user} message={item} key={item.date} showTime={showTime} />
                 } else if (chatroom === item.to || (chatroom === item.from && user.username === item.to)) {
-                    if (lastTime == undefined) {
+                    if (lastTime === undefined) {
                         showTime = true;
                         lastTime = item.date;
                     } else if (item.date - lastTime > 1000 * 60) {
@@ -111,6 +128,7 @@ export default function ChatContent(props) {
                     }
                     return <Message add_concat={add_concat} socket={socket} user={user} message={item} key={item.date} showTime={showTime} />
                 }
+                return '';
             })}
         </div>
     )
