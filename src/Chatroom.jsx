@@ -10,6 +10,49 @@ import { FireFilled } from '@ant-design/icons';
 import { Popover, Popconfirm, message as msa } from 'antd';
 const socket = io();
 
+var windowStatus = 'focus';
+window.onfocus = () => {
+    windowStatus = 'focus';
+}
+window.onblur = () => {
+    windowStatus = 'blur';
+};
+
+const notification = function (title, msg) {
+    let options = {
+        body: msg
+    }
+    let n;
+    if (!window.Notification) {
+        console.log('浏览器不支持通知');
+    } else {
+        if (Notification.permission === 'granted') {
+            n = new Notification(title, options)
+        } else if (Notification.permission === 'default') {
+            Notification.requestPermission().then(permission => {
+                if (permission === 'granted') {
+                    console.log('用户同意授权');
+                    n = new Notification(title, options); // 显示通知
+                } else if (permission === 'default') {
+                    console.warn('用户关闭授权 未刷新页面之前 可以再次请求授权');
+                } else {
+                    // denied
+                    console.log('用户拒绝授权 不能显示通知');
+                }
+            });
+        } else {
+            console.log('用户曾经拒绝过');
+        }
+    }
+    if(n){
+        n.onclick = function handleClick() {
+            window.focus();
+            this.close();
+        };
+        setTimeout(n.close.bind(n), 3000);
+    }
+}
+
 export default function Chatroom(props) {
     const {
         user,
@@ -120,7 +163,18 @@ export default function Chatroom(props) {
                     const toc = msg.to === user.username ? msg.from : msg.to;
                     updateLastMessageList(toc, msg);
                 }
+                let title = msg.from + '对';
+                if (msg.to === 'public') {
+                    title = title + '大家说:'
+                } else {
+                    title = title + '你说'
+                }
+                
+                if (windowStatus === 'blur') {
+                    notification(title,msg.msg);
+                }
             }
+
         })
         socket.on('add_concat', (from) => {
             console.log(from);
@@ -144,7 +198,7 @@ export default function Chatroom(props) {
         }, [setUser]
     )
 
-    const sendExp = (msg)=>{
+    const sendExp = (msg) => {
         socket.emit('chat', JSON.stringify({
             msg,
             from: user.username,
@@ -153,19 +207,38 @@ export default function Chatroom(props) {
         }))
     }
 
+    const sendImg = (msg) => {
+        socket.emit('chat', JSON.stringify({
+            msg,
+            from: user.username,
+            to: chatroom,
+            id: user.id
+        }))
+    }
+
+    const sendFile = (msg) => {
+        socket.emit('chat', JSON.stringify({
+            msg,
+            from: user.username,
+            to: chatroom,
+            id: user.id
+        }))
+    }
     const text = <span>在线列表</span>;
     const content = (
         <div>
 
-            {onlineList.map((item,index) => {
+            {onlineList.map((item, index) => {
                 return item === user.username ?
                     <p className="onlineMine" key={index}>{item}</p> :
                     <Popconfirm
                         placement="bottom"
                         icon={<FireFilled style={{ color: 'red' }} />}
                         onConfirm={() => { add_concat(item) }}
-                        title='您要添加对方为好友嘛?'>
-                        <p className="onlineItem" key={index}>{item}</p>
+                        title='您要添加对方为好友嘛?'
+                        key={index}
+                        >
+                        <p className="onlineItem">{item}</p>
                     </Popconfirm>
             })}
         </div>
@@ -201,12 +274,14 @@ export default function Chatroom(props) {
                         user={user}
                         friendList={friendList}
                         updateLastMessageList={updateLastMessageList}
-                        className="chatContent" />
+                        />
 
                     <InputContent
                         inpRef={inpRef}
                         socket={socket}
                         sendExp={sendExp}
+                        sendFile={sendFile}
+                        sendImg={sendImg}
                         addEmoji={addEmoji}
                         emojiShow={emojiShow}
                         toggleEmojiShow={toggleEmojiShow} />

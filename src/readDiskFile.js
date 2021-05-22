@@ -20,7 +20,6 @@ export default async function readDiskFIle(resultType = 'blob', accept = '*/*') 
             if (!file) {
                 return;
             }
-            
             const reader = new FileReader();
             reader.onloadend = function handleLoad() {
                 if (!this.result) {

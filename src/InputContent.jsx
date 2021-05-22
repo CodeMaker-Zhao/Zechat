@@ -4,7 +4,6 @@ import readDiskFile from './readDiskFile.js'
 import BaiduImage from './baidu.png';
 import { useRef } from 'react';
 import { Popover } from 'antd';
-import axios from 'axios'
 
 const emoji = [
     '呵呵', '哈哈', '吐舌', '啊', '酷', '怒', '开心', '汗', '泪', '黑线',
@@ -86,16 +85,28 @@ function SearchExpression(props) {
     )
 }
 
-function OtherTab() {
+function OtherTab({socket,sendImg,sendFile}) {
     async function sendImageMessage(image) {
         if (image.length > 5*1024*1024) {
             alert('要发送的图片过大');
             return;
         }
-        axios.post('./file',{
-            data:image.result,
-            filename:image.filename
+        await socket.emit('uploadImg',{
+            file:image.result,
+            name:image.filename
+        });
+        sendImg('$(File/Img)'+image.filename);
+    }
+    async function sendFileMessage(file) {
+        if(file.length > 10*1024*1024){
+            alert('要发送的文件过大');
+            return;
+        }
+        await socket.emit('uploadFile',{
+            file:file.result,
+            name:file.filename
         })
+        sendFile('$(File/File)'+file.filename)
     }
     async function handleSendImage() {
         const image = await readDiskFile('blob', 'image/png,image/jpeg,image/gif');
@@ -103,10 +114,16 @@ function OtherTab() {
         sendImageMessage(image);
         return null;
     }
+    async function handleSengFile() {
+        const file = await readDiskFile('blob','*/*');
+        if(!file)return;
+        console.log(file);
+        sendFileMessage(file);
+    }
     const content = (
         <div>
-            <div>上传文件</div>
-            <div onClick={handleSendImage}>上传图片</div>
+            <div className='uploadItem' onClick={handleSengFile}>上传文件</div>
+            <div className='uploadItem' onClick={handleSendImage}>上传图片</div>
         </div>
     )
     return (
@@ -119,11 +136,11 @@ function OtherTab() {
 }
 
 export default function InputContent(props) {
-    const { inpRef,emojiShow, addEmoji, toggleEmojiShow, socket, sendExp } = props;
+    const { inpRef,emojiShow,sendImg,sendFile, addEmoji, toggleEmojiShow, socket, sendExp } = props;
     return (
         <div className="inputContent">
             <EmojiTab addEmoji={addEmoji} socket={socket} sendExp={sendExp} emojiShow={emojiShow} toggleEmojiShow={toggleEmojiShow} />
-            <OtherTab />
+            <OtherTab socket={socket} sendImg={sendImg} sendFile={sendFile}/>
             <input className="input" ref={inpRef} placeholder="随便说点什么吧～"></input>
             <i className="submit">&#xe638;</i>
         </div>

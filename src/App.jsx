@@ -54,6 +54,14 @@ function App(props) {
         })
     }
   }, [dispatch])
+  useEffect(() => {
+    axios.get('/bg',{
+      responseType:'blob'
+    }).then(res=>{
+      const url = window.URL.createObjectURL(res.data);
+      document.getElementsByClassName('App')[0].style.backgroundImage = 'url('+url+')';
+    })
+  },[])
   return (
     <div className="App">
       <Switch>

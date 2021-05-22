@@ -4,6 +4,7 @@ import { Popconfirm, message as msa } from 'antd';
 import { FireFilled } from '@ant-design/icons';
 import './ChatContent.css'
 import BaiduImage from './baidu.png'
+import axios from 'axios'
 const emoji = [
     '呵呵', '哈哈', '吐舌', '啊', '酷', '怒', '开心', '汗', '泪', '黑线',
     '鄙视', '不高兴', '真棒', '钱', '疑问', '阴险', '吐', '咦', '委屈', '花心',
@@ -12,12 +13,55 @@ const emoji = [
     '灯泡', '蛋糕', '彩虹', '钱币', '咖啡', 'haha', '胜利', '大拇指', '弱', 'ok',
 ];
 
+function getFileImage(filename) {
+    const name = filename.replace('$(File/Img)', '');
+    axios.get('/fileImg', {
+        params: {
+            name
+        },
+        responseType: 'blob'
+    }).then(res => {
+        var url = window.URL.createObjectURL(res.data)
+        const div = document.createElement('div');
+        div.style.backgroundImage = 'url('+url+')';
+        div.className = 'mask';
+        const root = document.getElementById('root');
+        root.appendChild(div);
+        function handler() {
+            root.removeChild(div);
+            root.removeEventListener('click',handler,false);
+        }
+        root.addEventListener('click',handler,false)
+    })
+}
+
+function getFile(filename) {
+    const name = filename.replace('$(File/File)','');
+    axios.get('/file',{
+        params:{
+            name
+        },
+        responseType:'blob'
+    }).then(res=>{
+        const url = window.URL.createObjectURL(res.data);
+        const archor = document.createElement('a');
+        archor.download = decodeURIComponent(name);
+        archor.href = url;
+        archor.style.display = 'none';
+        archor.target = '_blank';
+        document.getElementById('root').appendChild(archor);
+        archor.click();
+        document.getElementById('root').removeChild(archor);
+        window.URL.revokeObjectURL(url)
+    })
+}
+
 function Message(props) {
     const { user, message, showTime, add_concat } = props;
     let [time] = useState(new Date(Number(message.date)).toLocaleTimeString());
     const msg = useMemo(() => {
-        let content,type = 'string';
-        if(/#\((.+?)\)/.test(message.msg)){
+        let content, type = 'string';
+        if (/#\((.+?)\)/.test(message.msg)) {
             content = message.msg.replace(/#\((.+?)\)/g, (r, e) => {
                 const index = emoji.indexOf(e);
                 if (index !== -1) {
@@ -26,22 +70,40 @@ function Message(props) {
                 }
                 return r;
             })
-        }else if(/\$\(img\)/.test(message.msg)){
+        } else if (/\$\(img\)/.test(message.msg)) {
             type = 'img';
-            content = message.msg.replace(/\$\(img\)/,'')
-        }else{
+            content = message.msg.replace(/\$\(img\)/, '')
+        } else if (message.msg.indexOf('$(File/Img)') !== -1) {
+            type = 'file/img';
+            content = message.msg;
+        }else if(message.msg.indexOf('$(File/File)')!==-1){
+            type = 'file/file';
+            content = message.msg;
+        } else {
             content = message.msg;
         }
-        if (type==='string') {
+        if (type === 'string') {
             return (
                 <div className="msgicon" dangerouslySetInnerHTML={{ __html: content }}>
 
                 </div>
             );
-        } else if (type==='img') {
+        } else if (type === 'img') {
             return (
                 <div >
                     <img className='exp' alt='消息图片' src={content}></img>
+                </div>
+            )
+        } else if (type === 'file/img') {
+            return (
+                <div className='fileImg' onClick={() => getFileImage(content)}>
+                    {'<>查看图片'}
+                </div>
+            )
+        }else if(type === 'file/file'){
+            return(
+                <div className='fileImg' onClick={()=>{getFile(content)}}>
+                    {'<>下载文件查看'}
                 </div>
             )
         }
@@ -107,7 +169,7 @@ export default function ChatContent(props) {
     }, [messageList, msl, chatroom]);
     return (
         <div ref={msl} className="messageList">
-            {messageList.map((item) => {
+            {messageList.map((item,index) => {
                 let showTime = false;
                 if (chatroom === 'public' && item.to === 'public') {
                     if (lastTime === undefined) {
@@ -117,7 +179,7 @@ export default function ChatContent(props) {
                         showTime = true;
                         lastTime = item.date;
                     }
-                    return <Message add_concat={add_concat} socket={socket} user={user} message={item} key={item.date} showTime={showTime} />
+                    return <Message add_concat={add_concat} socket={socket} user={user} message={item} key={index} showTime={showTime} />
                 } else if (chatroom === item.to || (chatroom === item.from && user.username === item.to)) {
                     if (lastTime === undefined) {
                         showTime = true;
@@ -126,9 +188,9 @@ export default function ChatContent(props) {
                         showTime = true;
                         lastTime = item.date;
                     }
-                    return <Message add_concat={add_concat} socket={socket} user={user} message={item} key={item.date} showTime={showTime} />
+                    return <Message add_concat={add_concat} socket={socket} user={user} message={item} key={index} showTime={showTime} />
                 }
-                return '';
+                return ''
             })}
         </div>
     )
