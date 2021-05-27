@@ -194,6 +194,7 @@ export default function Chatroom(props) {
         () => {
             setUser(null);
             localStorage.removeItem('notificationToken');
+            localStorage.removeItem('persist:root');
             window.location = '/login'
         }, [setUser]
     )

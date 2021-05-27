@@ -7,6 +7,8 @@ import{
     ACTION_SET_LAST_MESSAGE_LIST
 }from './action'
 
+import {combineReducers} from 'redux'
+
 const reducers = {
     user(state=null,action){
         const {type,payload} = action;
@@ -70,4 +72,4 @@ const reducers = {
     }
 }
 
-export default reducers;
+export default combineReducers(reducers);

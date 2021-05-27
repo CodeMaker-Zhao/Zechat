@@ -1,13 +1,18 @@
 import './App.css';
 import Login from './Login'
-import Signup from './Signup'
 import axios from 'axios'
-import Chatroom from './Chatroom'
-import React, { useMemo,useEffect } from 'react'
+import React, { useMemo, useEffect, lazy,Suspense } from 'react'
 import { Switch, Route, Redirect } from 'react-router-dom'
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux'
 import { setUser, updateLastMessageList, updateFriendList, setChatroom, toggleEmojiShow, setOnlineList } from './action'
+
+const si = import('./Signup')
+const ci = import('./Chatroom')
+
+const Signup = lazy(() => si)
+const Chatroom = lazy(() => ci)
+
 function App(props) {
   const { user, friendList, chatroom, dispatch, emojiShow, onlineList, lastMessageList } = props;
   const loginCbs = useMemo(() => {
@@ -33,54 +38,61 @@ function App(props) {
   }, [dispatch])
   useEffect(() => {
     let nToken = localStorage.getItem('notificationToken')
-    if(nToken){
-        axios.get('/users',{
-            headers:{
-                'Authorization': 'Bearer ' + nToken,
-            }
-        }).then(res=>{
-            const data = res.data;
-            if(data.code===0){
-                dispatch(setUser({
-                    username:data.username,
-                    id:data.id
-                }));
-                if(data.friendList){
-                    dispatch(updateFriendList(data.friendList));
-                }
-            }else if(data.code === 1){
-                alert(data.msg);
-            }
-        })
+    if (nToken) {
+      axios.get('/users', {
+        headers: {
+          'Authorization': 'Bearer ' + nToken,
+        }
+      }).then(res => {
+        const data = res.data;
+        if (data.code === 0) {
+          dispatch(setUser({
+            username: data.username,
+            id: data.id
+          }));
+          if (data.friendList&&friendList.length===1) {
+            dispatch(updateFriendList(data.friendList));
+          }
+        } else if (data.code === 1) {
+          alert(data.msg);
+        }
+      })
     }
-  }, [dispatch])
+  }, [dispatch,friendList.length])
   useEffect(() => {
-    axios.get('/bg',{
-      responseType:'blob'
-    }).then(res=>{
+    console.log('bg请求');
+    axios.get('/bg', {
+      responseType: 'blob'
+    }).then(res => {
       const url = window.URL.createObjectURL(res.data);
-      document.getElementsByClassName('App')[0].style.backgroundImage = 'url('+url+')';
+      document.getElementsByClassName('App')[0].style.backgroundImage = 'url(' + url + ')';
     })
-  },[])
+  }, [])
+  const signupSuspense = (<div className='wrapper'></div>);
+  const chatSuspense = (<div className='chatSuspense'></div>)
   return (
     <div className="App">
       <Switch>
         <Route path="/login">
           <Login user={user} {...loginCbs} />
         </Route>
-        <Route path="/signup">
-          <Signup {...signUpCbs} user={user} />
-        </Route>
+          <Route path="/signup">
+            <Suspense fallback={signupSuspense}>
+              <Signup {...signUpCbs} user={user} />
+            </Suspense>
+          </Route>
         <Route path="/chatroom">
           {
-            user==null?<Redirect to='/'></Redirect>:
-            <Chatroom onlineList={onlineList}
-            user={user}
-            chatroom={chatroom}
-            emojiShow={emojiShow}
-            friendList={friendList}
-            lastMessageList={lastMessageList}
-            {...chatRoomCbs} />
+            user == null ? <Redirect to='/'></Redirect> :
+            <Suspense fallback={chatSuspense}>
+              <Chatroom onlineList={onlineList}
+                user={user}
+                chatroom={chatroom}
+                emojiShow={emojiShow}
+                friendList={friendList}
+                lastMessageList={lastMessageList}
+                {...chatRoomCbs} />
+            </Suspense>  
           }
         </Route>
         <Route path="/">
