@@ -10,14 +10,6 @@ import { FireFilled } from '@ant-design/icons';
 import { Popover, Popconfirm, message as msa } from 'antd';
 const socket = io();
 
-var windowStatus = 'focus';
-window.onfocus = () => {
-    windowStatus = 'focus';
-}
-window.onblur = () => {
-    windowStatus = 'blur';
-};
-
 const notification = function (title, msg) {
     let options = {
         body: msg
@@ -170,7 +162,7 @@ export default function Chatroom(props) {
                     title = title + '你说'
                 }
                 
-                if (windowStatus === 'blur') {
+                if (window.document.visibilityState==='hidden') {
                     notification(title,msg.msg);
                 }
             }
